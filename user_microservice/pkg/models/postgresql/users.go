@@ -61,6 +61,24 @@ func (m *UserModel) GetUser(id int) (*models.User, error) {
 	return s, nil
 }
 
+func (m *UserModel) GetUserByEmailAndPassword(email, password string) (*models.User, error) {
+	stmt := `SELECT id, username, email, role, password FROM users
+      		WHERE email = $1 AND password = $2`
+
+	row := m.DB.QueryRow(context.Background(), stmt, email, password)
+	s := &models.User{}
+
+	err := row.Scan(&s.ID, &s.Username, &s.Email, &s.Role, &s.Password)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, models.ErrNoRecord
+		} else {
+			return nil, err
+		}
+	}
+	return s, nil
+}
+
 func (m *UserModel) GetAllUsers() ([]*models.User, error) {
 	stmt := `SELECT id, username, email, password, role FROM users
 			ORDER BY id`
