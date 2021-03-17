@@ -1,8 +1,9 @@
 package main
 
 import (
-	servicepb1 "final_project/posts_service/api"
-	servicepb2 "final_project/user_service/api"
+	"final-SA-Golang/favoritepb"
+	"final-SA-Golang/songpb"
+	"final-SA-Golang/userpb"
 	"flag"
 	"github.com/golangcollege/sessions"
 	"google.golang.org/grpc"
@@ -14,28 +15,35 @@ import (
 )
 
 type application struct {
-	c1            servicepb1.PostServiceClient
-	c2            servicepb2.UserServiceClient
-	errorLog      *log.Logger
-	infoLog       *log.Logger
-	session       *sessions.Session
-	templateCache map[string]*template.Template
+	userClient     userpb.UserServiceClient
+	songClient     protopb.SongServiceClient
+	favoriteClient favoritepb.FavoriteServiceClient
+	errorLog       *log.Logger
+	infoLog        *log.Logger
+	session        *sessions.Session
+	templateCache  map[string]*template.Template
 }
 
 func main() {
-	conn1, err1 := grpc.Dial("localhost:50051", grpc.WithInsecure())
-	conn2, err2 := grpc.Dial("localhost:50052", grpc.WithInsecure())
-	if err1 != nil {
-		log.Fatalf("could not connect: %v", err1)
+	userConn, userErr := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	songConn, songErr := grpc.Dial("localhost:50052", grpc.WithInsecure())
+	favoriteConn, favoriteErr := grpc.Dial("localhost:50052", grpc.WithInsecure())
+	if userErr != nil {
+		log.Fatalf("could not connect: %v", userErr)
 	}
-	defer conn1.Close()
-	if err2 != nil {
-		log.Fatalf("could not connect: %v", err2)
+	defer userConn.Close()
+	if songErr != nil {
+		log.Fatalf("could not connect: %v", songErr)
 	}
-	defer conn2.Close()
+	defer songConn.Close()
+	if favoriteErr != nil {
+		log.Fatalf("could not connect: %v", favoriteErr)
+	}
+	defer favoriteConn.Close()
 
-	c1 := servicepb1.NewPostServiceClient(conn1)
-	c2 := servicepb2.NewUserServiceClient(conn2)
+	userClient := userpb.NewUserServiceClient(userConn)
+	songClient := protopb.NewSongServiceClient(songConn)
+	favoriteClient := favoritepb.NewFavoriteServiceClient(favoriteConn)
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
@@ -53,12 +61,13 @@ func main() {
 	session.Lifetime = 12 * time.Hour
 
 	app := &application{
-		c1:            c1,
-		c2:            c2,
-		errorLog:      errorLog,
-		infoLog:       infoLog,
-		session:       session,
-		templateCache: templateCache,
+		userClient:     userClient,
+		songClient:     songClient,
+		favoriteClient: favoriteClient,
+		errorLog:       errorLog,
+		infoLog:        infoLog,
+		session:        session,
+		templateCache:  templateCache,
 	}
 
 	srv := &http.Server{

@@ -45,7 +45,7 @@ func (m *FavoritesModel) DeleteFavorites(UserID, SongID int) (*models.Favorites,
 }
 
 func (m *FavoritesModel) GetFavoritesByUserID(UserID int) ([]*models.Favorites, error) {
-	stmt := `SELECT song_id FROM favorites
+	stmt := `SELECT * FROM favorites
 			 WHERE user_id = $1`
 
 	rows, err := m.DB.Query(context.Background(), stmt, UserID)
