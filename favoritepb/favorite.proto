@@ -2,5 +2,43 @@ syntax = "proto3";
 
 package favoritepb;
 
+option go_package="gitlab.com\\bzholmyrza\\final-SA-Golang\\favoritepb;favoritepb";
+
+message Favorite {
+  int64 id = 1;
+  int64 user_id = 2;
+  int64 song_id = 3;
+}
+
+message CreateFavoriteRequest{
+  Favorite favorite = 1;
+}
+
+message CreateFavoriteResponse{
+  int32 id = 1;
+}
+
+message DeleteFavoriteRequest{
+  int64 u_id = 1;
+  int64 s_id = 2;
+}
+
+message DeleteFavoriteResponse{}
+
+message GetFavoriteRequest{
+  int32 user_id = 1;
+}
+
+message GetFavoriteResponse{
+  Favorite favorite = 1;
+}
+
+
+service FavoriteService {
+  rpc CreateFavorite(CreateFavoriteRequest) returns(CreateFavoriteResponse) {};
+  rpc DeleteFavorite(DeleteFavoriteRequest) returns(DeleteFavoriteResponse) {};
+  rpc GetFavorite( GetFavoriteRequest) returns(stream GetFavoriteResponse) {}
+}
+
 
 

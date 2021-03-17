@@ -1,8 +1,8 @@
 package main
 
 import (
+	"final-SA-Golang/music_microservice/pkg/models"
 	"github.com/Beibarys-SE-01/snippetbox/pkg/forms"
-	"github.com/Beibarys-SE-01/snippetbox/pkg/models"
 	"html/template"
 	"path/filepath"
 	"time"
@@ -12,8 +12,8 @@ type templateData struct {
 	CurrentYear int
 	Flash       string
 	Form        *forms.Form
-	Snippet     *models.Snippet
-	Snippets    []*models.Snippet
+	Song        *models.Song
+	Songs       []*models.Song
 }
 
 func humanDate(t time.Time) string {
